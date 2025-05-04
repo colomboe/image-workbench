@@ -1,0 +1,243 @@
+.ui-block {
+    color: white;
+
+    box-shadow: rgba(0, 0, 0, 0.3) 0 3px 6px, rgba(0, 0, 0, 0.22) 0 3px 6px;
+	background-color: rgb(89, 89, 89);
+	color: black;
+    border-radius: 25px;
+	font-size: 9pt;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 30px;
+    box-sizing: border-box;
+
+    position: relative;
+	
+    .block-handle {
+        width: 16px !important;
+        height: 16px !important;
+        border-radius: 8px !important;
+        border: solid 2px #6dc5ff !important;
+    }
+
+    .block-selection-line {
+        border-width: 3px !important;
+    }
+
+    .background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+        border-radius: 25px;
+
+        display: flex;
+        flex-direction: row;
+        box-sizing: border-box;
+
+        overflow: hidden;
+        align-items: center;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            cursor: pointer;
+        }
+
+        & .transparent-bg {
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            background-image:
+                linear-gradient(45deg, #ccc 25%, transparent 25%),
+                linear-gradient(-45deg, #ccc 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ccc 75%),
+                linear-gradient(-45deg, transparent 75%, #ccc 75%);
+            background-size: 24px 24px;
+            background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+        }
+
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0);
+        color: white;
+        z-index: 20;
+
+        display: flex;
+        flex-direction: row;
+        box-sizing: border-box;
+        transition: background-color 0.1s ease-in;
+
+        .selected & {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    }
+
+    .inPorts {
+        width: 30px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .snapArea {
+            border-radius: 0 25px 25px 0;
+            margin-right: 8px;
+        }
+    }
+
+    .outPorts {
+        width: 30px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: end;
+
+        .snapArea {
+            border-radius: 25px 0 0 25px;
+            margin-left: 8px;
+        }
+    }
+
+    .snapArea {
+        position: inherit;
+        border-radius: 0;
+        right: initial;
+        top: initial;
+        transform: none;
+        background-color: black;
+        opacity: 0.5;
+        width: 20px;
+        height: 40px;
+        border: none;
+
+        &.disabled {
+            opacity: 0.2;
+        }
+
+        &.error {
+            background-color: red;
+            opacity: 1;
+        }
+
+        &.warning {
+            background-color: orange;
+            opacity: 1;
+        }
+
+        &.traced {
+            background-color: white;
+            opacity: 0.8;
+        }
+
+        &:hover {
+            opacity: 0.2;
+        }
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        height: 100%;
+        padding: 16px;
+        gap: 10px;
+        overflow: hidden;
+        box-sizing: border-box;
+        opacity: 0;
+        transition: opacity 0.1s ease-in;
+
+        .selected & {
+            opacity: 1;
+        }
+
+        .body-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 20px;
+            font-size: 10pt;
+            input[type="text"] {
+                flex-grow: 1;
+                margin-left: 5px;
+            }
+
+
+            & .actions {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 4px;
+            }
+        }
+
+        textarea {
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            color: inherit;
+            border: none;
+            padding: 6px 8px;
+            resize: none;
+
+            &:focus {
+                outline: none;
+                border-color: #6dc5ff;
+                box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+            }
+        }
+
+        input[type="text"] {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            color: inherit;
+            border: none;
+            padding: 4px 6px;
+
+            &:focus {
+                outline: none;
+                border-color: #6dc5ff;
+                box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+            }
+        }
+
+        button {
+            color: inherit;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 4px 8px;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.7);
+            }
+            &:active {
+                background-color: rgba(0, 0, 0, 0.9);
+            }
+            &:focus {
+                outline: none;
+                border-color: #6dc5ff;
+                box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+            }
+        }
+
+    }
+
+}

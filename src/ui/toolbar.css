@@ -1,0 +1,83 @@
+.toolbar {
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: #15152c;
+    gap: 8px;
+
+    >:first-child {
+        padding: 0px 12px;
+        flex-grow: 1;
+    }
+
+    .model-settings {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            
+            label {
+                font-size: 0.8em;
+                color: #ccc;
+            }
+            
+            .setting-options {
+                display: flex;
+                gap: 4px;
+                
+                .setting-button {
+                    font-size: 0.85em;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    background-color: #333344;
+                    border: 1px solid #555566;
+                    color: #ccc;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    
+                    &:hover {
+                        background-color: #444455;
+                    }
+                    
+                    &.active {
+                        background-color: #555566;
+                        color: #ffffff;
+                        border-color: #7777aa;
+                    }
+                }
+            }
+        }
+    }
+
+    .toolbar-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        padding: 8px 12px;
+        margin-right: 8px;
+        background-color: #333344;
+        border: 1px solid #555566;
+        color: #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .toolbar-button:hover {
+        background-color: #444455;
+    }
+    .toolbar-button:active {
+        background-color: #555566;
+        color: #ffffff;
+        border-color: #7777aa;
+    }
+    .toolbar-button svg {
+        margin-right: 0;
+    }
+
+}
