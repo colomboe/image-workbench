@@ -5,7 +5,7 @@ I also looked online for simple tools that directly use the gpt-image-1 API and 
 
 When you have to produce multiple images with consistent characters and style, a chat-based UI can feel a bit restrictive. So I decided to build a small tool that talks directly to the OpenAI image-generation API. The interface is a very simple node-based editor that lets you link images together—so you can reliably reuse characters or environments across multiple prompts. I’ve also added inpainting support, even though gpt-image-1 doesn’t always honor an inpainting mask perfectly.
 
-If you’re curious, the source code is on my GitHub profile, and you can try it out here: https://msec.it/image-workbench
+If you’re curious, you can try it out here: https://msec.it/image-workbench
 
 A few things you’ll need to know before getting started:
 
