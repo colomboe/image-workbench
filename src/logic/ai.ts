@@ -4,21 +4,6 @@ import { Uploadable } from "openai/uploads.mjs";
 import { appState } from "./model";
 import { getApiKey } from "./local-storage";
 
-// Function to create an OpenAI client with the current API key
-function createOpenAIClient() {
-    const apiKey = appState.modelSettings.apiKey || getApiKey();
-    
-    if (!apiKey) {
-        throw new Error('OpenAI API key not configured. Click the API key button in the toolbar to set it.');
-    }
-    
-    return new OpenAI({
-        dangerouslyAllowBrowser: true,
-        timeout: 3 * 60 * 1000,
-        apiKey,
-    });
-}
-
 export interface GenerateImageRequest {
     prompt: string,
     imagesB64: string[],
@@ -112,35 +97,4 @@ function base64toUploadable(b64: string): Uploadable {
         bytes[i] = binary.charCodeAt(i);
     }
     return new File([bytes], 'image.png', { type: 'image/png', lastModified: Date.now() });
-}
-
-export async function aiCreateImageForReal(prompt: string): Promise<GeneratedImage> {
-    try {
-        // Create the client using our helper function
-        const client = createOpenAIClient();
-
-        const response = await client.images.generate({
-            model: 'dall-e-2',
-            prompt,
-            // quality: 'standard',
-            response_format: 'b64_json',
-            size: '256x256',
-        });
-
-        const usage = response.usage;
-        let costDollars = undefined
-        if (usage) {
-            const inputTextTokenCost = usage.input_tokens_details.text_tokens * 0.000005;
-            const inputImageTokenCost = usage.input_tokens_details.image_tokens * 0.00001;
-            const outputImageTokenCost = usage.output_tokens * 0.00004;
-            costDollars = inputTextTokenCost + inputImageTokenCost + outputImageTokenCost;
-        }
-
-        console.log(response);
-        const b64 = response.data![0].b64_json!;
-        return { b64, costDollars };
-    } catch (error: any) {
-        console.error("Error generating image:", error);
-        throw error;
-    }
 }
