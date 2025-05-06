@@ -17,29 +17,42 @@ export function InpainterCanvas() {
         if (placeholderRef.current === null) return;
 
         if (inpainterState.visible) {
+            // Create an image element and set properties to preserve alpha channel
             const image = new Image();
+            
+            // When the image loads, create the editor
+            image.onload = () => {
+                if (placeholderRef.current === null) return;
+                
+                // Create the editor with the image
+                const editor = Editor.createFromImage(
+                    placeholderRef.current as HTMLElement,
+                    image,
+                    {
+                        selectable: false,
+                    },
+                    {
+                        initialMode: EditorMode.brush,
+                        brush: {
+                            brushColor: '#ff0000',
+                            brushSize: 20
+                        },
+                        rect: {
+                            fillColor: '#ff0000'
+                        },
+                        image: false,
+                        textbox: false,
+                    }
+                );
+                setEditor(editor);
+            };
+            
+            // Set crossOrigin to anonymous to avoid CORS issues with canvas operations
+            image.crossOrigin = "anonymous";
+            
+            // Use PNG format which supports transparency
+            // We can't add query parameters to data URLs, so we'll use a clean approach
             image.src = `data:image/png;base64,${inpainterState.imageB64}`;
-
-            const editor = Editor.createFromImage(
-                placeholderRef.current,
-                image,
-                {
-                    selectable: false,
-                },
-                {
-                    initialMode: EditorMode.brush,
-                    brush: {
-                        brushColor: '#ff0000',
-                        brushSize: 20
-                    },
-                    rect: {
-                        fillColor: '#ff0000'
-                    },
-                    image: false,
-                    textbox: false,
-                }
-            );
-            setEditor(editor);
         } else {
             editor?.destroy();
             setEditor(null);
@@ -61,7 +74,8 @@ export function InpainterCanvas() {
         image.render(imageCanvasContext);
         applyMask(editor.getWidth(), editor.getHeight(), imageCanvasContext, maskCanvasContext);
 
-        const maskB64 = imageCanvas.toDataURL();
+        // Use PNG format with alpha channel support
+        const maskB64 = imageCanvas.toDataURL('image/png');
         const prefix = 'data:image/png;base64,';
         const cleanMaskBase64 = maskB64.startsWith(prefix) ? maskB64.slice(prefix.length) : maskB64;
         updateInpaintingMask(inpainterState.blockId!, cleanMaskBase64);
@@ -85,9 +99,11 @@ function createMemoryCanvas(width: number, height: number): [HTMLCanvasElement, 
 	const canvas = document.createElement('canvas');
 	canvas.width = width;
 	canvas.height = height;
-	const canvasContext = canvas.getContext('2d') as CanvasRenderingContext2D;
-	canvasContext.fillStyle = '#ffffff00';
-	canvasContext.fillRect(0, 0, width, height);
+	const canvasContext = canvas.getContext('2d', { alpha: true }) as CanvasRenderingContext2D;
+	// Clear with transparent background
+	canvasContext.clearRect(0, 0, width, height);
+	// Ensure alpha channel preservation
+	canvasContext.globalCompositeOperation = 'source-over';
 	return [canvas, canvasContext];
 }
 
@@ -95,7 +111,12 @@ function applyMask(width: number, height: number, target: CanvasRenderingContext
 	const imageCanvasData = target.getImageData(0, 0, width, height);
 	const maskCanvasData = mask.getImageData(0, 0, width, height);
 	for (let i = 0; i < imageCanvasData.data.length; i += 4) {
-		imageCanvasData.data[i + 3] = 255 - maskCanvasData.data[i + 3];
+		// If the original pixel has transparency, preserve it
+		const originalAlpha = imageCanvasData.data[i + 3];
+		const maskAlpha = maskCanvasData.data[i + 3];
+		// The new alpha is the inverse of the mask alpha, while respecting the original transparency
+		const normalizedMaskAlpha = maskAlpha / 255;
+		imageCanvasData.data[i + 3] = originalAlpha * (1 - normalizedMaskAlpha);
 	}
 	target.putImageData(imageCanvasData, 0, 0);
 }
