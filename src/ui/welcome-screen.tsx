@@ -9,8 +9,8 @@ export function WelcomeScreen() {
     return null;
   }
 
-  const handleStartNewProject = () => {
-    resetState();
+  const handleStartNewProject = async () => {
+    await resetState();
     appState.welcomeScreenVisible = false;
   };
 
