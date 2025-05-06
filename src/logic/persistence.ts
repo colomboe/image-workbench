@@ -13,12 +13,14 @@ let directoryHandle: FileSystemDirectoryHandle | null = null;
 
 /**
  * Prompts the user to select a directory for storing files.
+ * @returns The name of the selected directory
  */
-export async function selectDirectory(): Promise<void> {
+export async function selectDirectory(): Promise<string | undefined> {
   if (!window.showDirectoryPicker) {
     throw new Error('File System Access API is not supported in this browser.');
   }
   directoryHandle = await window.showDirectoryPicker();
+  return directoryHandle.name;
 }
 
 /**

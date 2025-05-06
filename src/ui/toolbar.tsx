@@ -108,6 +108,11 @@ export function Toolbar() {
                     </div>
                 </div>
             </div>
+            {state.currentProjectDirectory && (
+                <div className="project-name">
+                    <span title="Current project directory">Project: {state.currentProjectDirectory}</span>
+                </div>
+            )}
             <button className="toolbar-button" onClick={resetState} title="New project">
                 <BiFile />
             </button>

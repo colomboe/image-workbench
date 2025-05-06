@@ -66,6 +66,7 @@ export interface AppState {
     modelSettings: ModelSettings,
     reactFlowInstance: ReactFlowInstance<AppNode, Edge> | undefined,
     welcomeScreenVisible: boolean,
+    currentProjectDirectory: string | undefined,
 }
 
 export const appState = proxy<AppState>({
@@ -84,17 +85,20 @@ export const appState = proxy<AppState>({
         apiKey: getApiKey() ?? undefined,
     },
     reactFlowInstance: undefined,
+    currentProjectDirectory: undefined,
 });
 
 export async function resetState() {
-    await selectDirectory();
+    const directoryName = await selectDirectory();
     appState.nodes = [];
     appState.edges = [];
+    appState.currentProjectDirectory = directoryName;
     persistState();
 }
 
 export async function loadState() {
-    await selectDirectory();
+    const directoryName = await selectDirectory();
+    appState.currentProjectDirectory = directoryName;
     const loadedState = await loadJsonFile("workbench.json");
     if (loadedState) {
         appState.nodes = loadedState.nodes;
