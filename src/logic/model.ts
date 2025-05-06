@@ -65,6 +65,7 @@ export interface AppState {
     inpainter: InpainterState,
     modelSettings: ModelSettings,
     reactFlowInstance: ReactFlowInstance<AppNode, Edge> | undefined,
+    welcomeScreenVisible: boolean,
 }
 
 export const appState = proxy<AppState>({
@@ -75,6 +76,7 @@ export const appState = proxy<AppState>({
         blockId: undefined,
         imageB64: undefined
     },
+    welcomeScreenVisible: true,
     modelSettings: {
         quality: 'medium',
         size: '1024x1024',
