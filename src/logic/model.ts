@@ -209,6 +209,13 @@ export async function generateImage(blockId: string) {
     if (!isGeneratedImageNode(block)) {
         throw new Error(`Node with id ${blockId} is not a generated image node`);
     }
+    
+    // Check if API key is configured
+    if (!appState.modelSettings.apiKey) {
+        showToast('Error: An OpenAI "gpt-image-1 enabled" API key is required. Please configure it in settings.', 5000);
+        return;
+    }
+    
     block.data.status = 'processing';
     const outcome = await executeImageGeneration(blockId, appState.nodes, appState.edges);
     if (outcome.type === 'error') {
