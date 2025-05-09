@@ -193,7 +193,16 @@ export function deriveInpainting(blockId: string) {
         position: centerInViewport(block.width ?? 0, block.height ?? 0),
         data: { type: 'inpainting', name: v4(), imageB64: block.data.imageB64!, width: block.data.width!, height: block.data.height! },
     };
+
     appState.nodes.push(node);
+    appState.edges.push({
+        id: v4(),
+        source: blockId,
+        target: id,
+        type: 'default',
+        animated: false,
+    });
+
 }
 
 export function updateInpaintingMask(blockId: string, maskB64: string) {
