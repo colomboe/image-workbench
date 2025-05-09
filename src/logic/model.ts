@@ -135,7 +135,7 @@ export async function createProvidedImageNode(name: string, imageB64: string) {
         width,
         height,
         resizing: true,
-        position: { x: 0, y: 0 },
+        position: centerInViewport(width, height),
         data: { type: 'provided-image', name, imageB64, width, height },
     };
     appState.nodes.push(node);
@@ -150,7 +150,7 @@ export function createGeneratedImageNode() {
         width: 400,
         height: 300,
         resizing: true,
-        position: { x: 0, y: 0 },
+        position: centerInViewport(400, 300),
         data: {
             type: 'generated-image',
             status: 'prompt',
@@ -190,7 +190,7 @@ export function deriveInpainting(blockId: string) {
         width: block.width,
         height: block.height,
         resizing: true,
-        position: { x: 0, y: 0 },
+        position: centerInViewport(block.width ?? 0, block.height ?? 0),
         data: { type: 'inpainting', name: v4(), imageB64: block.data.imageB64!, width: block.data.width!, height: block.data.height! },
     };
     appState.nodes.push(node);
@@ -277,4 +277,20 @@ export function clearApiKey() {
     appState.modelSettings.apiKey = undefined;
     clearApiKeyFromStorage();
     showToast('API key cleared!', 3000);
+}
+
+function centerInViewport(width: number, height: number): { x: number; y: number } {
+    if (!appState.reactFlowInstance) return { x: 0, y: 0 };
+
+    const workspace = document.querySelector('.workspace') as HTMLDivElement;
+    const workspaceRect = workspace.getBoundingClientRect();
+    const center = appState.reactFlowInstance.screenToFlowPosition({
+        x: workspaceRect.x + workspaceRect.width / 2,
+        y: workspaceRect.y + workspaceRect.height / 2,
+    });  
+
+    return {
+        x: center.x - width / 2,
+        y: center.y - height / 2,
+    };
 }
