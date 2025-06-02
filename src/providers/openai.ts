@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 import { ImagesResponse } from "openai/resources.mjs";
 import { Uploadable } from "openai/uploads.mjs";
-import { appState } from "./model";
-import { getApiKey } from "./local-storage";
+import { appState } from "../logic/model";
+import { getApiKey } from "../logic/local-storage";
 
 export interface GenerateImageRequest {
     prompt: string,

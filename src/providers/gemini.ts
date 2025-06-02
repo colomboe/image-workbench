@@ -1,6 +1,6 @@
 import { ContentListUnion, GoogleGenAI, Modality } from '@google/genai';
-import { appState } from './model';
-import { getApiKey } from './local-storage';
+import { appState } from '../logic/model';
+import { getApiKey } from '../logic/local-storage';
 
 export interface GenerateImageRequest {
     prompt: string;
@@ -38,8 +38,8 @@ export async function aiGenerateImage(
 
     const ai = new GoogleGenAI({ apiKey });
 
-    const models = await ai.models.list();
-    console.log("Gemini models:", models.page);
+    // const models = await ai.models.list();
+    // console.log("Gemini models:", models.page);
 
     const contents: ContentListUnion = [
         { text: request.prompt },

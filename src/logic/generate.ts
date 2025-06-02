@@ -1,6 +1,6 @@
 import { Edge, Node } from "@xyflow/react";
 import { AppNode, appState, GeneratedImageNodeData } from "./model";
-import { aiGenerateImage } from "./ai";
+import { aiGenerateImage } from "../providers/openai";
 import { snapshot } from "valtio";
 
 export type GenerateImageResult = 
