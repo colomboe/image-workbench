@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { loadJsonFile, saveJsonFile, saveBase64PngFile, selectDirectory } from './persistence';
 import { showToast } from './toast-bridge';
 import { executeImageGeneration } from './generate';
-import { getApiKey, saveApiKey, clearApiKey as clearApiKeyFromStorage } from './local-storage';
+import { getApiKey, clearApiKey as clearApiKeyFromStorage, saveApiKeys, getApiKeys, clearApiKeys } from './local-storage';
 import { arrayBufferToBase64, getImageSize } from './image-utils';
 
 export type NodeType =
@@ -52,11 +52,17 @@ export interface InpainterState {
     imageB64: string | undefined,
 }
 
+export interface ApiKeys {
+    openai?: string;
+    gemini?: string;
+    replicate?: string;
+}
+
 export interface ModelSettings {
     quality: 'low' | 'medium' | 'high';
     size: '1024x1024' | '1536x1024' | '1024x1536';
     background: 'transparent' | 'opaque' | 'auto';
-    apiKey?: string;
+    apiKeys?: ApiKeys;
 }
 
 export interface AppState {
@@ -82,7 +88,7 @@ export const appState = proxy<AppState>({
         quality: 'medium',
         size: '1024x1024',
         background: 'auto',
-        apiKey: getApiKey() ?? undefined,
+        apiKeys: {}, // Will be loaded during initialization
     },
     reactFlowInstance: undefined,
     currentProjectDirectory: undefined,
@@ -220,8 +226,11 @@ export async function generateImage(blockId: string) {
     }
     
     // Check if API key is configured
-    if (!appState.modelSettings.apiKey) {
-        showToast('Error: An OpenAI "gpt-image-1 enabled" API key is required. Please configure it in settings.', 5000);
+    const hasApiKey = appState.modelSettings.apiKeys?.openai || 
+                     appState.modelSettings.apiKeys?.gemini;
+                     
+    if (!hasApiKey) {
+        showToast('Error: An API key is required for image generation. Please configure your API keys in the toolbar.', 5000);
         return;
     }
     
@@ -269,23 +278,41 @@ export async function importImageNode() {
     await createProvidedImageNode(name, b64);
 }
 
-export function loadApiKeyFromStorage() {
-    const storedApiKey = getApiKey();
-    if (storedApiKey) {
-        appState.modelSettings.apiKey = storedApiKey;
+export function setApiKeys(apiKeys: ApiKeys) {
+    appState.modelSettings.apiKeys = apiKeys;
+    saveApiKeys(apiKeys);
+    showToast('API keys saved!', 3000);
+}
+
+export function clearAllApiKeys() {
+    appState.modelSettings.apiKeys = {};
+    clearApiKeys();
+    showToast('All API keys cleared!', 3000);
+}
+
+export function loadApiKeysFromStorage() {
+    const storedApiKeys = getApiKeys();
+    if (Object.keys(storedApiKeys).length > 0) {
+        appState.modelSettings.apiKeys = storedApiKeys;
+    } else {
+        // Check for legacy API key and migrate it
+        const legacyApiKey = getApiKey();
+        if (legacyApiKey) {
+            appState.modelSettings.apiKeys = {
+                openai: legacyApiKey
+            };
+            // Save the migrated key to new format and clean up legacy
+            saveApiKeys({ openai: legacyApiKey });
+            clearApiKeyFromStorage();
+        }
     }
 }
 
-export function setApiKey(apiKey: string) {
-    appState.modelSettings.apiKey = apiKey;
-    saveApiKey(apiKey);
-    showToast('API key saved!', 3000);
-}
-
-export function clearApiKey() {
-    appState.modelSettings.apiKey = undefined;
-    clearApiKeyFromStorage();
-    showToast('API key cleared!', 3000);
+/**
+ * Initialize the application state by loading stored data
+ */
+export function initializeApp() {
+    loadApiKeysFromStorage();
 }
 
 function centerInViewport(width: number, height: number): { x: number; y: number } {

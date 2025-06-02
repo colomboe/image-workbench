@@ -1,6 +1,9 @@
 // Functions for managing data in browser local storage
 
+import { ApiKeys } from './model';
+
 const API_KEY_STORAGE_KEY = 'image-workbench-api-key';
+const API_KEYS_STORAGE_KEY = 'image-workbench-api-keys';
 
 /**
  * Saves the API key to browser local storage
@@ -23,4 +26,40 @@ export function getApiKey(): string | null {
  */
 export function clearApiKey(): void {
   localStorage.removeItem(API_KEY_STORAGE_KEY);
+}
+
+/**
+ * Saves multiple API keys to browser local storage
+ * @param apiKeys Object containing API keys for different providers
+ */
+export function saveApiKeys(apiKeys: ApiKeys): void {
+  localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(apiKeys));
+}
+
+/**
+ * Retrieves all API keys from browser local storage
+ * @returns The stored API keys object or empty object if not found
+ */
+export function getApiKeys(): ApiKeys {
+  const stored = localStorage.getItem(API_KEYS_STORAGE_KEY);
+  if (!stored) {
+    // Try to migrate legacy single API key
+    const legacyKey = getApiKey();
+    if (legacyKey) {
+      return { openai: legacyKey };
+    }
+    return {};
+  }
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Clears all API keys from browser local storage
+ */
+export function clearApiKeys(): void {
+  localStorage.removeItem(API_KEYS_STORAGE_KEY);
 }

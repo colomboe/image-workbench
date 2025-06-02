@@ -1,6 +1,5 @@
 import { ContentListUnion, GoogleGenAI, Modality } from '@google/genai';
 import { appState } from '../logic/model';
-import { getApiKey } from '../logic/local-storage';
 
 export interface GenerateImageRequest {
     prompt: string;
@@ -27,8 +26,8 @@ export async function aiGenerateImage(
     request: GenerateImageRequest
 ): Promise<GenerateImageResponse> {
     
-    // Retrieve API key
-    const apiKey = appState.modelSettings.apiKey || getApiKey();
+    // Retrieve API key from new structure or fallback to legacy
+    const apiKey = appState.modelSettings.apiKeys?.gemini;
     if (!apiKey) {
         return {
             type: 'error',

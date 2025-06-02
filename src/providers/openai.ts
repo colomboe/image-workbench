@@ -2,7 +2,6 @@ import OpenAI from "openai";
 import { ImagesResponse } from "openai/resources.mjs";
 import { Uploadable } from "openai/uploads.mjs";
 import { appState } from "../logic/model";
-import { getApiKey } from "../logic/local-storage";
 
 export interface GenerateImageRequest {
     prompt: string,
@@ -25,8 +24,8 @@ export interface GeneratedImage {
 export async function aiGenerateImage(generateImageRequest: GenerateImageRequest): Promise<GenerateImageResponse> {
     const { quality, size, background } = generateImageRequest;
     
-    // Get API key from app state or local storage
-    const apiKey = appState.modelSettings.apiKey || getApiKey();
+    // Get API key from app state (new structure) or fallback to legacy
+    const apiKey = appState.modelSettings.apiKeys?.openai;
     
     if (!apiKey) {
         return { 
