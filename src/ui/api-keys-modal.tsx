@@ -72,8 +72,8 @@ export function ApiKeysModal({ visible, onClose, onSave }: ApiKeysModalProps) {
                         </div>
                     </div>
                     
-                    <div className="api-key-group">
-                        <label htmlFor="openai-key">OpenAI API Key:</label>
+                    <div className={`api-key-group ${state.modelSettings.provider === 'openai' ? 'current-provider' : ''}`}>
+                        <label htmlFor="openai-key">OpenAI API Key: {state.modelSettings.provider === 'openai' && <span className="current-badge">Current</span>}</label>
                         <input
                             id="openai-key"
                             type="password"
@@ -85,8 +85,8 @@ export function ApiKeysModal({ visible, onClose, onSave }: ApiKeysModalProps) {
                         <span className="api-key-note">Required for gpt-image-1 model</span>
                     </div>
                     
-                    <div className="api-key-group">
-                        <label htmlFor="gemini-key">Gemini API Key:</label>
+                    <div className={`api-key-group ${state.modelSettings.provider === 'gemini' ? 'current-provider' : ''}`}>
+                        <label htmlFor="gemini-key">Gemini API Key: {state.modelSettings.provider === 'gemini' && <span className="current-badge">Current</span>}</label>
                         <input
                             id="gemini-key"
                             type="password"
@@ -98,8 +98,8 @@ export function ApiKeysModal({ visible, onClose, onSave }: ApiKeysModalProps) {
                         <span className="api-key-note">Required for Gemini image generation</span>
                     </div>
                     
-                    <div className="api-key-group">
-                        <label htmlFor="replicate-key">Replicate API Key:</label>
+                    <div className={`api-key-group ${state.modelSettings.provider === 'replicate' ? 'current-provider' : ''}`}>
+                        <label htmlFor="replicate-key">Replicate API Key: {state.modelSettings.provider === 'replicate' && <span className="current-badge">Current</span>}</label>
                         <input
                             id="replicate-key"
                             type="password"

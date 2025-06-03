@@ -59,6 +59,7 @@ export interface ApiKeys {
 }
 
 export interface ModelSettings {
+    provider: 'openai' | 'gemini' | 'replicate';
     quality: 'low' | 'medium' | 'high';
     size: '1024x1024' | '1536x1024' | '1024x1536';
     background: 'transparent' | 'opaque' | 'auto';
@@ -85,6 +86,7 @@ export const appState = proxy<AppState>({
     },
     welcomeScreenVisible: true,
     modelSettings: {
+        provider: 'openai',
         quality: 'medium',
         size: '1024x1024',
         background: 'auto',
@@ -225,12 +227,24 @@ export async function generateImage(blockId: string) {
         throw new Error(`Node with id ${blockId} is not a generated image node`);
     }
     
-    // Check if API key is configured
-    const hasApiKey = appState.modelSettings.apiKeys?.openai || 
-                     appState.modelSettings.apiKeys?.gemini;
+    // Check if API key is configured for the selected provider
+    const provider = appState.modelSettings.provider;
+    let hasApiKey = false;
+    
+    switch (provider) {
+        case 'openai':
+            hasApiKey = !!appState.modelSettings.apiKeys?.openai;
+            break;
+        case 'gemini':
+            hasApiKey = !!appState.modelSettings.apiKeys?.gemini;
+            break;
+        case 'replicate':
+            hasApiKey = !!appState.modelSettings.apiKeys?.replicate;
+            break;
+    }
                      
     if (!hasApiKey) {
-        showToast('Error: An API key is required for image generation. Please configure your API keys in the toolbar.', 5000);
+        showToast(`Error: ${provider.charAt(0).toUpperCase() + provider.slice(1)} API key is required for image generation. Please configure your API keys in the toolbar.`, 5000);
         return;
     }
     

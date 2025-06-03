@@ -112,6 +112,15 @@
 
 .api-key-group {
     margin-bottom: 24px;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.api-key-group.current-provider {
+    background-color: rgba(109, 197, 255, 0.1);
+    border-color: #6dc5ff;
 }
 
 .api-key-group label {
@@ -120,6 +129,19 @@
     font-weight: 500;
     color: #ffffff;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-badge {
+    background-color: #6dc5ff;
+    color: #1a1a2e;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 12px;
+    text-transform: uppercase;
 }
 
 .api-key-input {

@@ -1,6 +1,7 @@
 import { Edge, Node } from "@xyflow/react";
 import { AppNode, appState, GeneratedImageNodeData } from "./model";
-import { aiGenerateImage } from "../providers/openai";
+import { aiGenerateImage as openaiGenerateImage } from "../providers/openai";
+import { aiGenerateImage as geminiGenerateImage } from "../providers/gemini";
 import { snapshot } from "valtio";
 
 export type GenerateImageResult = 
@@ -53,14 +54,31 @@ export async function executeImageGeneration(nodeId: string, nodes: AppNode[], e
     // Import appState to get the modelSettings
     const { modelSettings } = snapshot(appState);
 
-    const outcome = await aiGenerateImage({
+    // Route to the correct provider based on the selected provider
+    let outcome;
+    const request = {
         prompt: node.data.prompt,
         imagesB64: inputImages,
         inpaintingMaskB64: inpaintingInputImage,
         quality: modelSettings.quality,
         size: modelSettings.size,
         background: modelSettings.background,
-    });
+    };
+
+    switch (modelSettings.provider) {
+        case 'openai':
+            outcome = await openaiGenerateImage(request);
+            break;
+        case 'gemini':
+            outcome = await geminiGenerateImage(request);
+            break;
+        case 'replicate':
+            // TODO: Implement replicate provider
+            outcome = { type: 'error' as const, message: 'Replicate provider not yet implemented' };
+            break;
+        default:
+            outcome = { type: 'error' as const, message: 'Unknown provider selected' };
+    }
 
     if (outcome.type === 'error')
         return { type: 'error', message: outcome.message };

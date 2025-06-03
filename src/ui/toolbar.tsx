@@ -22,6 +22,10 @@ export function Toolbar() {
     const updateBackground = (background: 'transparent' | 'opaque' | 'auto') => {
         appState.modelSettings.background = background;
     };
+
+    const updateProvider = (provider: 'openai' | 'gemini' | 'replicate') => {
+        appState.modelSettings.provider = provider;
+    };
     
     const configureApiKey = () => {
         setShowApiKeysModal(true);
@@ -36,74 +40,113 @@ export function Toolbar() {
             <div className="toolbar">
                 <div className="model-settings">
                     <div className="setting-group">
-                        <label>Quality:</label>
+                        <label>Provider:</label>
                         <div className="setting-options">
                             <button 
-                                className={`setting-button ${state.modelSettings.quality === 'low' ? 'active' : ''}`}
-                                onClick={() => updateQuality('low')}
+                                className={`setting-button ${state.modelSettings.provider === 'openai' ? 'active' : ''}`}
+                                onClick={() => updateProvider('openai')}
                             >
-                                Low
+                                OpenAI
                             </button>
                             <button 
-                                className={`setting-button ${state.modelSettings.quality === 'medium' ? 'active' : ''}`}
-                                onClick={() => updateQuality('medium')}
+                                className={`setting-button ${state.modelSettings.provider === 'gemini' ? 'active' : ''}`}
+                                onClick={() => updateProvider('gemini')}
                             >
-                                Medium
+                                Gemini
                             </button>
                             <button 
-                                className={`setting-button ${state.modelSettings.quality === 'high' ? 'active' : ''}`}
-                                onClick={() => updateQuality('high')}
+                                className={`setting-button ${state.modelSettings.provider === 'replicate' ? 'active' : ''}`}
+                                onClick={() => updateProvider('replicate')}
+                                disabled={true}
+                                title="Replicate support coming soon"
                             >
-                                High
+                                Replicate
                             </button>
                         </div>
                     </div>
-                    <div className="setting-group">
-                        <label>Size:</label>
-                        <div className="setting-options">
-                            <button 
-                                className={`setting-button ${state.modelSettings.size === '1024x1024' ? 'active' : ''}`}
-                                onClick={() => updateSize('1024x1024')}
-                            >
-                                1024x1024
-                            </button>
-                            <button 
-                                className={`setting-button ${state.modelSettings.size === '1536x1024' ? 'active' : ''}`}
-                                onClick={() => updateSize('1536x1024')}
-                            >
-                                1536x1024
-                            </button>
-                            <button 
-                                className={`setting-button ${state.modelSettings.size === '1024x1536' ? 'active' : ''}`}
-                                onClick={() => updateSize('1024x1536')}
-                            >
-                                1024x1536
-                            </button>
+                    {state.modelSettings.provider === 'openai' && (
+                        <>
+                            <div className="setting-group">
+                                <label>Quality:</label>
+                                <div className="setting-options">
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.quality === 'low' ? 'active' : ''}`}
+                                        onClick={() => updateQuality('low')}
+                                    >
+                                        Low
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.quality === 'medium' ? 'active' : ''}`}
+                                        onClick={() => updateQuality('medium')}
+                                    >
+                                        Medium
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.quality === 'high' ? 'active' : ''}`}
+                                        onClick={() => updateQuality('high')}
+                                    >
+                                        High
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="setting-group">
+                                <label>Size:</label>
+                                <div className="setting-options">
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.size === '1024x1024' ? 'active' : ''}`}
+                                        onClick={() => updateSize('1024x1024')}
+                                    >
+                                        1024x1024
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.size === '1536x1024' ? 'active' : ''}`}
+                                        onClick={() => updateSize('1536x1024')}
+                                    >
+                                        1536x1024
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.size === '1024x1536' ? 'active' : ''}`}
+                                        onClick={() => updateSize('1024x1536')}
+                                    >
+                                        1024x1536
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="setting-group">
+                                <label>Background:</label>
+                                <div className="setting-options">
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.background === 'transparent' ? 'active' : ''}`}
+                                        onClick={() => updateBackground('transparent')}
+                                    >
+                                        Transparent
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.background === 'opaque' ? 'active' : ''}`}
+                                        onClick={() => updateBackground('opaque')}
+                                    >
+                                        Opaque
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.background === 'auto' ? 'active' : ''}`}
+                                        onClick={() => updateBackground('auto')}
+                                    >
+                                        Auto
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    {state.modelSettings.provider === 'gemini' && (
+                        <div className="provider-info">
+                            <span className="provider-note">Gemini: Default generation settings</span>
                         </div>
-                    </div>
-                    <div className="setting-group">
-                        <label>Background:</label>
-                        <div className="setting-options">
-                            <button 
-                                className={`setting-button ${state.modelSettings.background === 'transparent' ? 'active' : ''}`}
-                                onClick={() => updateBackground('transparent')}
-                            >
-                                Transparent
-                            </button>
-                            <button 
-                                className={`setting-button ${state.modelSettings.background === 'opaque' ? 'active' : ''}`}
-                                onClick={() => updateBackground('opaque')}
-                            >
-                                Opaque
-                            </button>
-                            <button 
-                                className={`setting-button ${state.modelSettings.background === 'auto' ? 'active' : ''}`}
-                                onClick={() => updateBackground('auto')}
-                            >
-                                Auto
-                            </button>
+                    )}
+                    {state.modelSettings.provider === 'replicate' && (
+                        <div className="provider-info">
+                            <span className="provider-note">Replicate: Coming soon</span>
                         </div>
-                    </div>
+                    )}
                 </div>
                 {state.currentProjectDirectory && (
                     <div className="project-name">

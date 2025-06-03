@@ -57,7 +57,30 @@
                         color: #ffffff;
                         border-color: #7777aa;
                     }
+                    
+                    &:disabled {
+                        background-color: #222233;
+                        color: #666;
+                        cursor: not-allowed;
+                        border-color: #444455;
+                        opacity: 0.6;
+                        
+                        &:hover {
+                            background-color: #222233;
+                        }
+                    }
                 }
+            }
+        }
+        
+        .provider-info {
+            display: flex;
+            align-items: center;
+            
+            .provider-note {
+                font-size: 0.8em;
+                color: #aaccff;
+                font-style: italic;
             }
         }
     }
