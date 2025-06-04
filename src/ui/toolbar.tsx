@@ -26,6 +26,14 @@ export function Toolbar() {
     const updateProvider = (provider: 'openai' | 'gemini' | 'replicate') => {
         appState.modelSettings.provider = provider;
     };
+
+    const updateReplicateEditingModel = (model: 'flux-kontext-pro' | 'flux-kontext-max') => {
+        appState.modelSettings.replicateEditingModel = model;
+    };
+
+    const updateReplicateGenerationModel = (model: 'flux-schnell' | 'flux-1.1-pro' | 'flux-1.1-pro-ultra') => {
+        appState.modelSettings.replicateGenerationModel = model;
+    };
     
     const configureApiKey = () => {
         setShowApiKeysModal(true);
@@ -57,8 +65,7 @@ export function Toolbar() {
                             <button 
                                 className={`setting-button ${state.modelSettings.provider === 'replicate' ? 'active' : ''}`}
                                 onClick={() => updateProvider('replicate')}
-                                disabled={true}
-                                title="Replicate support coming soon"
+                                title="Replicate flux-kontext-pro model"
                             >
                                 Replicate
                             </button>
@@ -143,9 +150,56 @@ export function Toolbar() {
                         </div>
                     )}
                     {state.modelSettings.provider === 'replicate' && (
-                        <div className="provider-info">
-                            <span className="provider-note">Replicate: Coming soon</span>
-                        </div>
+                        <>
+                            <div className="setting-group">
+                                <label>Editing Model:</label>
+                                <div className="setting-options">
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.replicateEditingModel === 'flux-kontext-pro' ? 'active' : ''}`}
+                                        onClick={() => updateReplicateEditingModel('flux-kontext-pro')}
+                                        title="Standard quality image editing"
+                                    >
+                                        Kontext Pro
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.replicateEditingModel === 'flux-kontext-max' ? 'active' : ''}`}
+                                        onClick={() => updateReplicateEditingModel('flux-kontext-max')}
+                                        title="Premium quality image editing"
+                                    >
+                                        Kontext Max
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="setting-group">
+                                <label>Generation Model:</label>
+                                <div className="setting-options">
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.replicateGenerationModel === 'flux-schnell' ? 'active' : ''}`}
+                                        onClick={() => updateReplicateGenerationModel('flux-schnell')}
+                                        title="Fast generation"
+                                    >
+                                        Schnell
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.replicateGenerationModel === 'flux-1.1-pro' ? 'active' : ''}`}
+                                        onClick={() => updateReplicateGenerationModel('flux-1.1-pro')}
+                                        title="High quality generation"
+                                    >
+                                        1.1 Pro
+                                    </button>
+                                    <button 
+                                        className={`setting-button ${state.modelSettings.replicateGenerationModel === 'flux-1.1-pro-ultra' ? 'active' : ''}`}
+                                        onClick={() => updateReplicateGenerationModel('flux-1.1-pro-ultra')}
+                                        title="Ultra high quality generation"
+                                    >
+                                        1.1 Ultra
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="provider-info">
+                                <span className="provider-note">Editing requires input image, Generation works standalone</span>
+                            </div>
+                        </>
                     )}
                 </div>
                 {state.currentProjectDirectory && (

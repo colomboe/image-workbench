@@ -10,18 +10,12 @@ import {
     GeminiGenerateImageRequest,
     GeminiGenerateImageResponse
 } from "../providers/gemini";
+import { 
+    replicateGenerateImage,
+    ReplicateGenerateImageRequest,
+    ReplicateGenerateImageResponse
+} from "../providers/replicate";
 import { snapshot } from "valtio";
-
-// TODO: Uncomment these types when implementing replicate provider
-// type ReplicateGenerateImageRequest = {
-//     prompt: string;
-//     imagesB64: string[];
-//     // TODO: Add replicate-specific parameters when implementing
-// };
-
-// type ReplicateGenerateImageResponse = 
-//     | { type: 'error', message: string }
-//     | { type: 'success', imageB64: string, costDollars?: number };
 
 export type GenerateImageResult = 
     | { type: 'error', message: string }
@@ -100,6 +94,15 @@ export async function executeImageGeneration(nodeId: string, nodes: AppNode[], e
             break;
         }
         case 'gemini': {
+            // Gemini doesn't support inpainting
+            if (inpaintingInputImage) {
+                outcome = { 
+                    type: 'error', 
+                    message: 'Gemini does not support inpainting. Please disconnect any inpainting nodes or switch to OpenAI provider.' 
+                };
+                break;
+            }
+            
             const geminiRequest: GeminiGenerateImageRequest = {
                 prompt: node.data.prompt,
                 imagesB64: inputImages,
@@ -117,12 +120,44 @@ export async function executeImageGeneration(nodeId: string, nodes: AppNode[], e
             }
             break;
         }
-        case 'replicate':
-            // TODO: Implement replicate provider
-            // When implementing, create a ReplicateGenerateImageRequest similar to other providers
-            // and handle provider-specific parameters and response format
-            outcome = { type: 'error', message: 'Replicate provider not yet implemented' };
+        case 'replicate': {
+            // Replicate doesn't support inpainting
+            if (inpaintingInputImage) {
+                outcome = { 
+                    type: 'error', 
+                    message: 'Replicate does not support inpainting. Please disconnect any inpainting nodes or switch to OpenAI provider.' 
+                };
+                break;
+            }
+            
+            // Replicate flux-kontext models accept only one input image for editing
+            if (inputImages.length > 1) {
+                outcome = { 
+                    type: 'error', 
+                    message: 'Replicate editing models accept only one input image. Please connect only one image node for editing.' 
+                };
+                break;
+            }
+            
+            const replicateRequest: ReplicateGenerateImageRequest = {
+                prompt: node.data.prompt,
+                imagesB64: inputImages,
+                editingModel: modelSettings.replicateEditingModel,
+                generationModel: modelSettings.replicateGenerationModel,
+            };
+            const replicateResponse: ReplicateGenerateImageResponse = await replicateGenerateImage(replicateRequest);
+            
+            if (replicateResponse.type === 'error') {
+                outcome = { type: 'error', message: replicateResponse.message };
+            } else {
+                outcome = { 
+                    type: 'success', 
+                    imageB64: replicateResponse.imageB64, 
+                    costDollars: undefined // Replicate doesn't provide cost information
+                };
+            }
             break;
+        }
         default:
             outcome = { type: 'error', message: 'Unknown provider selected' };
     }

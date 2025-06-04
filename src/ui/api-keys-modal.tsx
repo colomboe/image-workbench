@@ -108,7 +108,7 @@ export function ApiKeysModal({ visible, onClose, onSave }: ApiKeysModalProps) {
                             placeholder="r8_..."
                             className="api-key-input"
                         />
-                        <span className="api-key-note">Required for Replicate models (planned)</span>
+                        <span className="api-key-note">Required for Replicate models (flux-kontext-pro/max for editing, flux-schnell/1.1-pro/ultra for generation)</span>
                     </div>
                 </div>
                 

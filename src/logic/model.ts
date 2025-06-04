@@ -63,6 +63,8 @@ export interface ModelSettings {
     quality: 'low' | 'medium' | 'high';
     size: '1024x1024' | '1536x1024' | '1024x1536';
     background: 'transparent' | 'opaque' | 'auto';
+    replicateEditingModel: 'flux-kontext-pro' | 'flux-kontext-max';
+    replicateGenerationModel: 'flux-schnell' | 'flux-1.1-pro' | 'flux-1.1-pro-ultra';
     apiKeys?: ApiKeys;
 }
 
@@ -90,6 +92,8 @@ export const appState = proxy<AppState>({
         quality: 'medium',
         size: '1024x1024',
         background: 'auto',
+        replicateEditingModel: 'flux-kontext-pro',
+        replicateGenerationModel: 'flux-schnell',
         apiKeys: {}, // Will be loaded during initialization
     },
     reactFlowInstance: undefined,
