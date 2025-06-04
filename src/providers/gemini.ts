@@ -66,3 +66,54 @@ export async function geminiGenerateImage(
 
     return { type: 'success', imageB64: b64 };
 }
+
+export interface GeminiGenerateTextRequest {
+    prompt: string;
+}
+
+export type GeminiGenerateTextResponse =
+    | { type: 'error'; message: string }
+    | { type: 'success'; text: string };
+
+/**
+ * Generate text using Gemini LLM API.
+ */
+export async function geminiGenerateText(
+    request: GeminiGenerateTextRequest
+): Promise<GeminiGenerateTextResponse> {
+    
+    // Retrieve API key from new structure or fallback to legacy
+    const apiKey = appState.modelSettings.apiKeys?.gemini;
+    if (!apiKey) {
+        return {
+            type: 'error',
+            message: 'Gemini API key not configured. Click the API key button in the toolbar to set it.'
+        };
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.0-flash',
+            contents: [{ text: request.prompt }],
+        });
+
+        const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!text) {
+            return {
+                type: 'error',
+                message: 'No text response found in Gemini response.'
+            };
+        }
+
+        return { type: 'success', text };
+    } catch (error) {
+        return {
+            type: 'error',
+            message: `Gemini API error: ${error instanceof Error ? error.message : String(error)}`
+        };
+    }
+}
+
