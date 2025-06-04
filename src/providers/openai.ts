@@ -3,7 +3,7 @@ import { ImagesResponse } from "openai/resources.mjs";
 import { Uploadable } from "openai/uploads.mjs";
 import { appState } from "../logic/model";
 
-export interface GenerateImageRequest {
+export interface OpenAIGenerateImageRequest {
     prompt: string,
     imagesB64: string[],
     inpaintingMaskB64: string | undefined,
@@ -12,16 +12,11 @@ export interface GenerateImageRequest {
     background: 'transparent' | 'opaque' | 'auto',
 }
 
-export type GenerateImageResponse =
+export type OpenAIGenerateImageResponse =
     | { type: 'error', message: string }
     | { type: 'success', imageB64: string, costDollars: number | undefined };
 
-export interface GeneratedImage {
-    b64: string,
-    costDollars: number | undefined,
-}
-
-export async function aiGenerateImage(generateImageRequest: GenerateImageRequest): Promise<GenerateImageResponse> {
+export async function openaiGenerateImage(generateImageRequest: OpenAIGenerateImageRequest): Promise<OpenAIGenerateImageResponse> {
     const { quality, size, background } = generateImageRequest;
     
     // Get API key from app state (new structure) or fallback to legacy

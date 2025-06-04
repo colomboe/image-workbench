@@ -1,8 +1,27 @@
 import { Edge, Node } from "@xyflow/react";
 import { AppNode, appState, GeneratedImageNodeData } from "./model";
-import { aiGenerateImage as openaiGenerateImage } from "../providers/openai";
-import { aiGenerateImage as geminiGenerateImage } from "../providers/gemini";
+import { 
+    openaiGenerateImage, 
+    OpenAIGenerateImageRequest,
+    OpenAIGenerateImageResponse
+} from "../providers/openai";
+import { 
+    geminiGenerateImage,
+    GeminiGenerateImageRequest,
+    GeminiGenerateImageResponse
+} from "../providers/gemini";
 import { snapshot } from "valtio";
+
+// TODO: Uncomment these types when implementing replicate provider
+// type ReplicateGenerateImageRequest = {
+//     prompt: string;
+//     imagesB64: string[];
+//     // TODO: Add replicate-specific parameters when implementing
+// };
+
+// type ReplicateGenerateImageResponse = 
+//     | { type: 'error', message: string }
+//     | { type: 'success', imageB64: string, costDollars?: number };
 
 export type GenerateImageResult = 
     | { type: 'error', message: string }
@@ -54,34 +73,59 @@ export async function executeImageGeneration(nodeId: string, nodes: AppNode[], e
     // Import appState to get the modelSettings
     const { modelSettings } = snapshot(appState);
 
-    // Route to the correct provider based on the selected provider
-    let outcome;
-    const request = {
-        prompt: node.data.prompt,
-        imagesB64: inputImages,
-        inpaintingMaskB64: inpaintingInputImage,
-        quality: modelSettings.quality,
-        size: modelSettings.size,
-        background: modelSettings.background,
-    };
+    // Route to the correct provider based on the selected provider and create provider-specific requests
+    let outcome: GenerateImageResult;
 
     switch (modelSettings.provider) {
-        case 'openai':
-            outcome = await openaiGenerateImage(request);
+        case 'openai': {
+            const openaiRequest: OpenAIGenerateImageRequest = {
+                prompt: node.data.prompt,
+                imagesB64: inputImages,
+                inpaintingMaskB64: inpaintingInputImage,
+                quality: modelSettings.quality,
+                size: modelSettings.size,
+                background: modelSettings.background,
+            };
+            const openaiResponse: OpenAIGenerateImageResponse = await openaiGenerateImage(openaiRequest);
+            
+            if (openaiResponse.type === 'error') {
+                outcome = { type: 'error', message: openaiResponse.message };
+            } else {
+                outcome = { 
+                    type: 'success', 
+                    imageB64: openaiResponse.imageB64, 
+                    costDollars: openaiResponse.costDollars 
+                };
+            }
             break;
-        case 'gemini':
-            outcome = await geminiGenerateImage(request);
+        }
+        case 'gemini': {
+            const geminiRequest: GeminiGenerateImageRequest = {
+                prompt: node.data.prompt,
+                imagesB64: inputImages,
+            };
+            const geminiResponse: GeminiGenerateImageResponse = await geminiGenerateImage(geminiRequest);
+            
+            if (geminiResponse.type === 'error') {
+                outcome = { type: 'error', message: geminiResponse.message };
+            } else {
+                outcome = { 
+                    type: 'success', 
+                    imageB64: geminiResponse.imageB64, 
+                    costDollars: undefined // Gemini doesn't provide cost information
+                };
+            }
             break;
+        }
         case 'replicate':
             // TODO: Implement replicate provider
-            outcome = { type: 'error' as const, message: 'Replicate provider not yet implemented' };
+            // When implementing, create a ReplicateGenerateImageRequest similar to other providers
+            // and handle provider-specific parameters and response format
+            outcome = { type: 'error', message: 'Replicate provider not yet implemented' };
             break;
         default:
-            outcome = { type: 'error' as const, message: 'Unknown provider selected' };
+            outcome = { type: 'error', message: 'Unknown provider selected' };
     }
 
-    if (outcome.type === 'error')
-        return { type: 'error', message: outcome.message };
-    else
-        return { type: 'success', imageB64: outcome.imageB64, costDollars: outcome.costDollars };
+    return outcome;
 }

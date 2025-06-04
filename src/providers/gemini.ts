@@ -1,30 +1,21 @@
 import { ContentListUnion, GoogleGenAI, Modality } from '@google/genai';
 import { appState } from '../logic/model';
 
-export interface GenerateImageRequest {
+export interface GeminiGenerateImageRequest {
     prompt: string;
     imagesB64: string[];
-    inpaintingMaskB64: string | undefined;
-    quality: 'low' | 'medium' | 'high';
-    size: '1024x1024' | '1536x1024' | '1024x1536';
-    background: 'transparent' | 'opaque' | 'auto';
 }
 
-export type GenerateImageResponse =
+export type GeminiGenerateImageResponse =
     | { type: 'error'; message: string }
-    | { type: 'success'; imageB64: string; costDollars: number | undefined };
-
-export interface GeneratedImage {
-    b64: string;
-    costDollars: number | undefined;
-}
+    | { type: 'success'; imageB64: string };
 
 /**
  * Generate or edit an image using Gemini API via @google/genai.
  */
-export async function aiGenerateImage(
-    request: GenerateImageRequest
-): Promise<GenerateImageResponse> {
+export async function geminiGenerateImage(
+    request: GeminiGenerateImageRequest
+): Promise<GeminiGenerateImageResponse> {
     
     // Retrieve API key from new structure or fallback to legacy
     const apiKey = appState.modelSettings.apiKeys?.gemini;
@@ -73,5 +64,5 @@ export async function aiGenerateImage(
         };
     }
 
-    return { type: 'success', imageB64: b64, costDollars: undefined };
+    return { type: 'success', imageB64: b64 };
 }
